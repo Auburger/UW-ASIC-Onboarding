@@ -9,12 +9,12 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
-Explain how your project works
+This project is for an SPI-controlled PWM peripheral. It takes in 3 inputs: SCLK, COPI and nCS from an SPI controller and communicates to a PWM module.
 
 ## How to test
 
-Explain how to use your project
+cocotb is used for testing.
 
 ## External hardware
 
-List external hardware used in your project (e.g. PMOD, LED display, etc), if any
+None.
