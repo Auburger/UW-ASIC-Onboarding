@@ -1,17 +1,15 @@
 module spi_peripheral (
     input wire clk,
     input wire rst_n,
-    input wire [2:0] ui_in,
+    input wire sclk_in,
+    input wire copi_in,
+    input wire ncs_in,
     output reg [7:0] en_reg_out_7_0,
     output reg [7:0] en_reg_out_15_8,
     output reg [7:0] en_reg_pwm_7_0,
     output reg [7:0] en_reg_pwm_15_8,
     output reg [7:0] pwm_duty_cycle); // surely this is fine...
-
-    wire sclk_in = ui_in[0];
-    wire copi_in = ui_in[1];
-    wire ncs_in = ui_in[2];
-
+    
     // Clock domain crossing bit:
     reg [1:0] sclk_chain;
     reg [1:0] copi_chain;
