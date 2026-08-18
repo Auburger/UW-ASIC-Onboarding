@@ -57,7 +57,6 @@ module spi_peripheral (
 
     reg [15:0] data; // the packet
     reg [4:0] counter; // counts the number of 1 bit signals sent
-    reg transaction_done;
 
     // Data sampling logic
     always @(posedge clk or negedge rst_n) begin
@@ -67,7 +66,6 @@ module spi_peripheral (
         end
         else if (ncs_falling_edge) begin
             counter <= 5'd0; // start a new transaction
-            transaction_done <= 1'b0;
         end
         else if (~ncs_final & sclk_rising_edge) begin // collect data when sclk is rising and when not selecting another chip
             data <= {data[14:0], copi_final};
@@ -76,12 +74,14 @@ module spi_peripheral (
     end
 
     // Transaction done flag
+    reg transaction_done;
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) transaction_done <= 1'b0;
         else begin
             transaction_done <= (counter == 5'd16 && ncs_rising_edge);
         end
     end
+    
     // Data sending
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
