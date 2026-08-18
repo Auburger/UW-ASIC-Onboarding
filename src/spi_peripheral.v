@@ -50,8 +50,10 @@ module spi_peripheral (
     
     wire ncs_falling_edge;
     wire sclk_rising_edge;
+    wire ncs_rising_edge;
     assign ncs_falling_edge = !ncs_final && ncs_prev;
     assign sclk_rising_edge = sclk_final && !sclk_prev;
+    assign ncs_rising_edge = ncs_final && !ncs_prev;
 
     reg [15:0] data; // the packet
     reg [4:0] counter; // counts the number of 1 bit signals sent
@@ -77,7 +79,7 @@ module spi_peripheral (
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) transaction_done <= 1'b0;
         else begin
-            transaction_done <= (counter == 5'd16);
+            transaction_done <= (counter == 5'd16 && ncs_rising_edge);
         end
     end
     // Data sending
