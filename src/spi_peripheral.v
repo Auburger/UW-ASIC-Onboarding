@@ -71,7 +71,7 @@ module spi_peripheral (
         end
         else if (~ncs_final & sclk_rising_edge) begin // collect data when sclk is rising and when not selecting another chip
             data <= {data[14:0], copi_final};
-            if (counter < 4'd16) counter <= counter + 1;
+            if (counter < 5'd16) counter <= counter + 1;
         end
     end
 
