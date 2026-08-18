@@ -218,7 +218,7 @@ async def test_pwm_duty(dut):
     await RisingEdge(dut.uo_out_0)
     rising250 = get_sim_time(units='ns')
 
-    cycle50 = ((falling50 - rising50) / (rising250 - rising50)) * 100
+    cycle50 = ((rising50 - falling50) / (rising250 - rising50)) * 100
     assert 49 <= cycle50 <= 51
 
     # 0% duty test
@@ -234,5 +234,5 @@ async def test_pwm_duty(dut):
     await send_spi_transaction(dut, 1, 0x04, 0xFF)
     await ClockCycles(dut.clk, 67420)
     assert dut.uo_out_0.value == 1
-    
+
     dut._log.info("PWM Duty Cycle test completed successfully")
