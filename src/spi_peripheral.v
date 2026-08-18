@@ -67,7 +67,6 @@ module spi_peripheral (
         end
         else if (ncs_falling_edge) begin
             counter <= 5'd0; // start a new transaction
-            transaction_done <= 1'b0;
         end
         else if (~ncs_final & sclk_rising_edge & ~transaction_done) begin // collect data when sclk is rising and when not selecting another chip
             data <= {data[14:0], copi_final};
