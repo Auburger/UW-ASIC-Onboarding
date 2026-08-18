@@ -48,29 +48,38 @@ module spi_peripheral (
         end
     end
     
-    wire ncs_rising_edge;
+    wire ncs_falling_edge;
     wire sclk_rising_edge;
-    assign ncs_rising_edge = ncs_final && !ncs_prev;
+    assign ncs_falling_edge = !ncs_final && ncs_prev;
     assign sclk_rising_edge = sclk_final && !sclk_prev;
 
     reg [15:0] data; // the packet
     reg [4:0] counter; // counts the number of 1 bit signals sent
-    
+    reg transaction_done;
+
     // Data sampling logic
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             data <= 16'd0;
             counter <= 5'd0;
         end
-        else if (ncs_rising_edge) begin
+        else if (ncs_falling_edge) begin
             counter <= 5'd0; // start a new transaction
+            transaction_done <= 1'b0;
         end
-        else if (~ncs_final & sclk_rising_edge) begin // collect data when sclk is rising and when not selecting another chip
+        else if (~ncs_final & sclk_rising_edge & ~transaction_done) begin // collect data when sclk is rising and when not selecting another chip
             data <= {data[14:0], copi_final};
             counter <= counter + 1;
         end
     end
 
+    // Transaction done flag
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) transaction_done <= 1'b0;
+        else begin
+            transaction_done <= (counter == 5'd16);
+        end
+    end
     // Data sending
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -80,15 +89,17 @@ module spi_peripheral (
             en_reg_pwm_15_8 <= 8'd0;
             pwm_duty_cycle <= 8'd0;
         end
-        else if (sclk_rising_edge && !ncs_final && (counter == 5'd16) && data[15]) begin
-            case (data[14:8])
-                7'h00 : en_reg_out_7_0 <= data[7:0];
-                7'h01 : en_reg_out_15_8 <= data[7:0];
-                7'h02 : en_reg_pwm_7_0 <= data[7:0];
-                7'h03 : en_reg_pwm_15_8 <= data[7:0];
-                7'h04 : pwm_duty_cycle <= data[7:0];
-                default : ;// do nothing if address invalid
-            endcase
+        else if (sclk_rising_edge && !ncs_final && transaction_done) begin
+            if (data[15]) begin
+                case (data[14:8])
+                    7'h00 : en_reg_out_7_0 <= data[7:0];
+                    7'h01 : en_reg_out_15_8 <= data[7:0];
+                    7'h02 : en_reg_pwm_7_0 <= data[7:0];
+                    7'h03 : en_reg_pwm_15_8 <= data[7:0];
+                    7'h04 : pwm_duty_cycle <= data[7:0];
+                    default : ;// do nothing if address invalid
+                endcase
+            end
         end 
     end
 endmodule
