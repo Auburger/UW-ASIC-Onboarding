@@ -48,9 +48,9 @@ module spi_peripheral (
         end
     end
     
-    wire ncs_falling_edge;
+    wire ncs_rising_edge;
     wire sclk_rising_edge;
-    assign ncs_falling_edge = !ncs_final && ncs_prev;
+    assign ncs_rising_edge = ncs_final && !ncs_prev;
     assign sclk_rising_edge = sclk_final && !sclk_prev;
 
     reg [15:0] data; // the packet
@@ -62,7 +62,7 @@ module spi_peripheral (
             data <= 16'd0;
             counter <= 5'd0;
         end
-        else if (ncs_falling_edge) begin
+        else if (ncs_rising_edge) begin
             counter <= 5'd0; // start a new transaction
         end
         else if (~ncs_final & sclk_rising_edge) begin // collect data when sclk is rising and when not selecting another chip
