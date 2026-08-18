@@ -1,6 +1,6 @@
 module spi_peripheral (
-    input clk;
-    input rst_n;
+    input clk,
+    input rst_n,
     input sclk_in, 
     input copi_in,
     input ncs_in,
@@ -35,8 +35,10 @@ module spi_peripheral (
     assign copi_final = copi_chain[1];
     assign ncs_final = ncs_chain[1];
 
-    assign wire ncs_falling_edge = ~ncs_final & ncs_chain[0]; // previous value of ncs
-    assign wire sclk_rising_edge = sclk_final & ~sclk_chain[0];
+    wire ncs_falling_edge;
+    wire sclk_rising_edge;
+    assign ncs_falling_edge = ~ncs_final & ncs_chain[0]; // previous value of ncs
+    assign sclk_rising_edge = sclk_final & ~sclk_chain[0];
 
     reg [15:0] data; // the packet
     reg [4:0] counter; // counts the number of 1 bit signals sent
