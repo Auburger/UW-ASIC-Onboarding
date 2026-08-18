@@ -28,15 +28,18 @@ module spi_peripheral (
         end
     end
     // always take the more stable value of ..._chain[1]
-    assign wire sclk_final = sclk_chain[1];
-    assign wire copi_final = copi_chain[1];
-    assign wire ncs_final = ncs_chain[1];
+    wire sclk_final;
+    wire copi_final;
+    wire ncs_final;
+    assign sclk_final = sclk_chain[1];
+    assign copi_final = copi_chain[1];
+    assign ncs_final = ncs_chain[1];
 
     assign wire ncs_falling_edge = ~ncs_final & ncs_chain[0]; // previous value of ncs
     assign wire sclk_rising_edge = sclk_final & ~sclk_chain[0];
 
     reg [15:0] data; // the packet
-    reg [3:0] counter; // counts the number of 1 bit signals sent
+    reg [4:0] counter; // counts the number of 1 bit signals sent
     
     // Data sampling logic
     always @(posedge clk or negedge rst_n) begin
