@@ -222,17 +222,19 @@ async def test_pwm_duty(dut):
     assert 49 <= cycle50 <= 51
 
     # 0% duty test
-    await send_spi_transaction(dut, 1, 0x00, 0x01)
-    await send_spi_transaction(dut, 1, 0x02, 0x01)
-    await send_spi_transaction(dut, 1, 0x04, 0x00)
-    await ClockCycles(dut.clk, 67420)
-    assert dut.uo_out_0.value == 0
+    for cycle in range(100):
+        await send_spi_transaction(dut, 1, 0x00, 0x01)
+        await send_spi_transaction(dut, 1, 0x02, 0x01)
+        await send_spi_transaction(dut, 1, 0x04, 0x00)
+        await ClockCycles(dut.clk, 67420)
+        assert dut.uo_out_0.value == 0
 
     # 100% duty test
-    await send_spi_transaction(dut, 1, 0x00, 0x01)
-    await send_spi_transaction(dut, 1, 0x02, 0x01)
-    await send_spi_transaction(dut, 1, 0x04, 0xFF)
-    await ClockCycles(dut.clk, 67420)
-    assert dut.uo_out_0.value == 1
+    for cycle in range(100):
+        await send_spi_transaction(dut, 1, 0x00, 0x01)
+        await send_spi_transaction(dut, 1, 0x02, 0x01)
+        await send_spi_transaction(dut, 1, 0x04, 0xFF)
+        await ClockCycles(dut.clk, 67420)
+        assert dut.uo_out_0.value == 1
 
     dut._log.info("PWM Duty Cycle test completed successfully")
